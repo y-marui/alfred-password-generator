@@ -3,31 +3,56 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>com.example.alfred-workflow-template</string>
+	<string>com.github.y-marui.alfred-password-generator</string>
 	<key>connections</key>
 	<dict>
-		<key>36381EAF-63DA-4000-AED5-AF6DAF671396</key>
+		<key>0412B2E6-130D-4C14-AE41-FA7CBE0002A6</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>D90DBB99-FC05-4BE8-B79B-C4DFD1FE55F9</string>
+				<string>7D08A8C0-1589-428E-BB8F-D1B69354C70C</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>sourceoutputuid</key>
+				<string>F15A7C7D-0B24-4A18-A7D7-BC1C62EF4E05</string>
+				<key>vitoclose</key>
+				<true/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>4F78A934-A8D7-45FA-AF77-4CFDC3B41398</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
 				<string></string>
 				<key>vitoclose</key>
-				<false/>
+				<true/>
+			</dict>
+		</array>
+		<key>69B5A1A8-DA0D-4BEA-9263-A34590DC70C2</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>0412B2E6-130D-4C14-AE41-FA7CBE0002A6</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<true/>
 			</dict>
 		</array>
 	</dict>
 	<key>createdby</key>
-	<string>Your Name</string>
+	<string>Yukihiro Marui</string>
 	<key>description</key>
-	<string>Alfred Workflow Template</string>
+	<string>Generate passwords with customizable length and character set</string>
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>Workflow Template</string>
+	<string>Password Generator</string>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -38,7 +63,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<true/>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -46,7 +71,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>keyword</key>
-				<string>wf</string>
+				<string>passgen</string>
 				<key>queuedelaycustom</key>
 				<integer>3</integer>
 				<key>queuedelayimmediatelyinitially</key>
@@ -56,7 +81,7 @@
 				<key>queuemode</key>
 				<integer>1</integer>
 				<key>runningsubtext</key>
-				<string>Loading…</string>
+				<string>Generating…</string>
 				<key>script</key>
 				<string>[ "${use_uv:-1}" = "1" ] &amp;&amp; command -v uv &gt;/dev/null 2&gt;&amp;1 &amp;&amp; exec uv run python scripts/entry.py "$1" || exec python3 scripts/entry.py "$1"</string>
 				<key>scriptargtype</key>
@@ -64,9 +89,9 @@
 				<key>scriptfile</key>
 				<string></string>
 				<key>subtext</key>
-				<string>Search or configure</string>
+				<string>Generate a password — passgen [panc] [split] [length] [by] [pattern]</string>
 				<key>title</key>
-				<string>Workflow Template</string>
+				<string>Password Generator</string>
 				<key>type</key>
 				<integer>0</integer>
 				<key>withspace</key>
@@ -75,59 +100,128 @@
 			<key>type</key>
 			<string>alfred.workflow.input.scriptfilter</string>
 			<key>uid</key>
-			<string>36381EAF-63DA-4000-AED5-AF6DAF671396</string>
+			<string>69B5A1A8-DA0D-4BEA-9263-A34590DC70C2</string>
 			<key>version</key>
 			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>browser</key>
-				<string></string>
-				<key>skipqueryencode</key>
+				<key>conditions</key>
+				<array>
+					<dict>
+						<key>inputstring</key>
+						<string>{var:history}</string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>0</integer>
+						<key>matchstring</key>
+						<string>1</string>
+						<key>outputlabel</key>
+						<string>save to history</string>
+						<key>uid</key>
+						<string>F15A7C7D-0B24-4A18-A7D7-BC1C62EF4E05</string>
+					</dict>
+				</array>
+				<key>elselabel</key>
+				<string>skip history</string>
+				<key>hideelse</key>
 				<false/>
-				<key>skipvarencode</key>
-				<false/>
-				<key>spaces</key>
-				<string></string>
-				<key>url</key>
-				<string>{query}</string>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.openurl</string>
+			<string>alfred.workflow.utility.conditional</string>
 			<key>uid</key>
-			<string>D90DBB99-FC05-4BE8-B79B-C4DFD1FE55F9</string>
+			<string>0412B2E6-130D-4C14-AE41-FA7CBE0002A6</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<true/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<false/>
+				<key>transient</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>7D08A8C0-1589-428E-BB8F-D1B69354C70C</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<true/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<false/>
+				<key>transient</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>4F78A934-A8D7-45FA-AF77-4CFDC3B41398</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
 	</array>
 	<key>readme</key>
-	<string># Workflow Template
+	<string># Password Generator
 
-A starting point for building Alfred workflows in Python.
+Generate passwords with customizable length and character set.
 
 ## Usage
 
-* wf &lt;query&gt;  — search
-* wf config   — show current settings
-* wf help     — show available commands
+* passgen [length] [pattern]              — basic (default: 18 chars, A-Za-z0-9)
+* passgen panc [length] [pattern]         — with punctuation (!@#^&amp;*)
+* passgen split [length] [by] [pattern]   — split by groups (default: 18/6)
+* passgen panc split [length] [by] [pattern] — split with punctuation
 
-Replace the placeholder commands and API client with your own logic.</string>
+Press Enter to copy the selected password to the clipboard.
+
+## Pattern syntax
+
+Characters can be listed directly (e.g. ABCabc012) or as ranges (e.g. A-Za-z0-9).
+Punctuation range: !-* expands to !@#^&amp;*</string>
 	<key>uidata</key>
 	<dict>
-		<key>36381EAF-63DA-4000-AED5-AF6DAF671396</key>
+		<key>0412B2E6-130D-4C14-AE41-FA7CBE0002A6</key>
 		<dict>
 			<key>xpos</key>
 			<real>300</real>
 			<key>ypos</key>
-			<real>15</real>
+			<real>50</real>
 		</dict>
-		<key>D90DBB99-FC05-4BE8-B79B-C4DFD1FE55F9</key>
+		<key>4F78A934-A8D7-45FA-AF77-4CFDC3B41398</key>
 		<dict>
 			<key>xpos</key>
 			<real>500</real>
 			<key>ypos</key>
-			<real>15</real>
+			<real>100</real>
+		</dict>
+		<key>69B5A1A8-DA0D-4BEA-9263-A34590DC70C2</key>
+		<dict>
+			<key>xpos</key>
+			<real>50</real>
+			<key>ypos</key>
+			<real>50</real>
+		</dict>
+		<key>7D08A8C0-1589-428E-BB8F-D1B69354C70C</key>
+		<dict>
+			<key>xpos</key>
+			<real>500</real>
+			<key>ypos</key>
+			<real>0.0</real>
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
@@ -143,13 +237,32 @@ Replace the placeholder commands and API client with your own logic.</string>
 				<string>Use uv instead of python3 when available</string>
 			</dict>
 			<key>description</key>
-			<string>When enabled and uv is installed, scripts and vendor installs run via uv. Recommended when the workflow depends on non-standard libraries (workflow/vendor/).</string>
+			<string>When enabled and uv is installed, scripts run via uv. Recommended when the workflow depends on non-standard libraries.</string>
 			<key>label</key>
 			<string>Use uv</string>
 			<key>type</key>
 			<string>checkbox</string>
 			<key>variable</key>
 			<string>use_uv</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<false/>
+				<key>required</key>
+				<false/>
+				<key>text</key>
+				<string>Add password to clipboard history</string>
+			</dict>
+			<key>description</key>
+			<string>When enabled, generated passwords are saved to Alfred's clipboard history. Keeping passwords in history is not recommended for security.</string>
+			<key>label</key>
+			<string>Clipboard History</string>
+			<key>type</key>
+			<string>checkbox</string>
+			<key>variable</key>
+			<string>history</string>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -175,61 +288,10 @@ Replace the placeholder commands and API client with your own logic.</string>
 			<key>variable</key>
 			<string>log_level</string>
 		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>default</key>
-				<string>300</string>
-				<key>required</key>
-				<false/>
-			</dict>
-			<key>description</key>
-			<string>How long (in seconds) API responses are cached on disk. Increase for slower-changing data; decrease for real-time results.</string>
-			<key>label</key>
-			<string>Cache TTL (seconds)</string>
-			<key>type</key>
-			<string>textfield</string>
-			<key>variable</key>
-			<string>cache_ttl</string>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>default</key>
-				<string>https://api.example.com/v1</string>
-				<key>required</key>
-				<false/>
-			</dict>
-			<key>description</key>
-			<string>Base URL for the external API. Replace with your actual API endpoint.</string>
-			<key>label</key>
-			<string>API Base URL</string>
-			<key>type</key>
-			<string>textfield</string>
-			<key>variable</key>
-			<string>api_base_url</string>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>default</key>
-				<string>5</string>
-				<key>required</key>
-				<false/>
-			</dict>
-			<key>description</key>
-			<string>HTTP request timeout in seconds. Increase if the API is slow; decrease to fail faster.</string>
-			<key>label</key>
-			<string>API Timeout (seconds)</string>
-			<key>type</key>
-			<string>textfield</string>
-			<key>variable</key>
-			<string>api_timeout</string>
-		</dict>
 	</array>
 	<key>version</key>
-	<string>0.1.0</string>
+	<string>1.0.0</string>
 	<key>webaddress</key>
-	<string>https://github.com/yourname/your-workflow</string>
+	<string>https://github.com/y-marui/alfred-password-generator</string>
 </dict>
 </plist>

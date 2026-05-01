@@ -1,7 +1,7 @@
 [project]
-name = "alfred-workflow-template"
-version = "0.1.0"
-description = "Alfred Workflow development template"
+name = "alfred-password-generator"
+version = "1.0.0"
+description = "Alfred workflow to generate passwords with customizable length and character set"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
@@ -9,10 +9,10 @@ license = { text = "MIT" }
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/yourname/alfred-workflow-template"
-Repository = "https://github.com/yourname/alfred-workflow-template"
-"Bug Tracker" = "https://github.com/yourname/alfred-workflow-template/issues"
-Changelog = "https://github.com/yourname/alfred-workflow-template/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/y-marui/alfred-password-generator"
+Repository = "https://github.com/y-marui/alfred-password-generator"
+"Bug Tracker" = "https://github.com/y-marui/alfred-password-generator/issues"
+Changelog = "https://github.com/y-marui/alfred-password-generator/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
