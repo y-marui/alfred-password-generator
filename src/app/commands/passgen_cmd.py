@@ -1,9 +1,10 @@
 """passgen command - generate passwords.
 
 Usage in Alfred:
-  passgen [length] [pattern]
-  passgen panc [length] [pattern]
-  passgen split [length] [by] [pattern]
+  passgen [length]                      — overview of all patterns
+  passgen [length] [pattern]            — custom charset (single result)
+  passgen panc [length] [pattern]       — with punctuation
+  passgen split [length] [by] [pattern] — split into groups
   passgen panc split [length] [by] [pattern]
 
 Default patterns:
@@ -27,11 +28,30 @@ _PATTERN_BASIC = "A-Za-z0-9"
 _PATTERN_PANC = "A-Za-z0-9!-*"
 _NUM_SUGGESTIONS = 5
 
+_OVERVIEW = [
+    ("basic", _PATTERN_BASIC, False),
+    ("panc", _PATTERN_PANC, False),
+    ("split", _PATTERN_BASIC, True),
+    ("panc split", _PATTERN_PANC, True),
+]
+
 
 def handle_basic(args: str) -> None:
-    """passgen [length] [pattern] — basic password without punctuation."""
+    """passgen [length] [pattern] — overview or custom password."""
     log.debug("passgen command: args=%r", args)
-    _run_basic(args, _PATTERN_BASIC)
+    parts = args.strip().split(None, 1)
+    if not parts:
+        _show_overview(_DEFAULT_LENGTH)
+        return
+    try:
+        length = int(parts[0])
+    except ValueError:
+        _run_basic(args, _PATTERN_BASIC, count=1)
+        return
+    if len(parts) == 1:
+        _show_overview(length)
+    else:
+        _run_basic(args, _PATTERN_BASIC, count=1)
 
 
 def handle_panc(args: str) -> None:
@@ -50,10 +70,29 @@ def handle_split(args: str) -> None:
     _run_split(args, _PATTERN_BASIC)
 
 
-def _run_basic(args: str, default_pattern: str) -> None:
+def _show_overview(length: int) -> None:
+    items = []
+    for i, (name, pattern, do_split) in enumerate(_OVERVIEW):
+        try:
+            if do_split:
+                pwd = passgen_service.generate_split(pattern, length, _DEFAULT_BY)
+                subtitle = f"{name} · {length} chars in groups of {_DEFAULT_BY}"
+            else:
+                pwd = passgen_service.generate(pattern, length)
+                subtitle = f"{name} · {length} chars"
+        except ValueError:
+            continue
+        items.append(item(title=pwd, subtitle=subtitle, arg=pwd, uid=f"passgen-{i}"))
+    if not items:
+        output([error_item(f"No valid patterns for length {length}")])
+        return
+    output(items, skip_knowledge=True)
+
+
+def _run_basic(args: str, default_pattern: str, count: int = _NUM_SUGGESTIONS) -> None:
     length, pattern = _parse_basic(args, default_pattern)
     subtitle = f"{length} chars, pattern: {pattern}"
-    _output(lambda: passgen_service.generate(pattern, length), subtitle)
+    _output(lambda: passgen_service.generate(pattern, length), subtitle, count=count)
 
 
 def _run_split(args: str, default_pattern: str) -> None:
@@ -99,9 +138,9 @@ def _parse_split(args: str, default_pattern: str) -> tuple[int, int, str]:
     return length, by, pattern
 
 
-def _output(gen_fn: Callable[[], str], subtitle: str) -> None:
+def _output(gen_fn: Callable[[], str], subtitle: str, count: int = _NUM_SUGGESTIONS) -> None:
     items = []
-    for i in range(_NUM_SUGGESTIONS):
+    for i in range(count):
         try:
             pwd = gen_fn()
         except ValueError as e:

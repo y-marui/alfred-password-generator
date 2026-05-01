@@ -11,16 +11,36 @@ class TestPassgenCommand:
     def _items(self, capsys) -> list:
         return json.loads(capsys.readouterr().out)["items"]
 
-    def test_empty_query_returns_suggestions(self, capsys):
+    def test_empty_query_shows_overview(self, capsys):
         passgen_cmd.handle_basic("")
         items = self._items(capsys)
-        assert len(items) == passgen_cmd._NUM_SUGGESTIONS
-        assert all(len(it["title"]) == passgen_cmd._DEFAULT_LENGTH for it in items)
+        assert len(items) == len(passgen_cmd._OVERVIEW)
+        subtitles = [it["subtitle"] for it in items]
+        assert any("basic" in s for s in subtitles)
+        assert any("panc" in s for s in subtitles)
+        assert any("split" in s for s in subtitles)
 
-    def test_custom_length(self, capsys):
+    def test_length_only_shows_overview(self, capsys):
         passgen_cmd.handle_basic("24")
         items = self._items(capsys)
-        assert all(len(it["title"]) == 24 for it in items)
+        assert len(items) == len(passgen_cmd._OVERVIEW)
+        for it in items:
+            assert "24" in it["subtitle"]
+
+    def test_non_divisible_length_skips_split(self, capsys):
+        # 20 is not divisible by 6, so split variants are skipped
+        passgen_cmd.handle_basic("20")
+        items = self._items(capsys)
+        subtitles = [it["subtitle"] for it in items]
+        assert all("split" not in s for s in subtitles)
+
+    def test_custom_pattern_returns_single_result(self, capsys):
+        passgen_cmd.handle_basic("18 A-Z")
+        items = self._items(capsys)
+        assert len(items) == 1
+        chars = items[0]["title"]
+        assert all(c.isupper() for c in chars)
+        assert len(chars) == 18
 
     def test_panc_includes_punctuation_by_default(self, capsys):
         passgen_cmd.handle_panc("")
