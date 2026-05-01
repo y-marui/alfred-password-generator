@@ -5,8 +5,8 @@ This document covers the development workflow, conventions, and guidelines for c
 ## Development Setup
 
 ```bash
-git clone https://github.com/yourname/alfred-workflow-template
-cd alfred-workflow-template
+git clone https://github.com/y-marui/alfred-password-generator
+cd alfred-password-generator
 make install   # installs dev dependencies via uv
 ```
 

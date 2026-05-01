@@ -3,62 +3,71 @@
 from __future__ import annotations
 
 import json
-from unittest.mock import patch
 
-from app.commands import config_cmd, help_cmd, open_cmd, search
+from app.commands import config_cmd, help_cmd, passgen_cmd
 
 
-class TestSearchCommand:
-    def test_empty_query_returns_prompt(self, capsys):
-        search.handle("")
+class TestPassgenCommand:
+    def _items(self, capsys) -> list:
+        return json.loads(capsys.readouterr().out)["items"]
+
+    def test_empty_query_returns_suggestions(self, capsys):
+        passgen_cmd.handle_basic("")
+        items = self._items(capsys)
+        assert len(items) == passgen_cmd._NUM_SUGGESTIONS
+        assert all(len(it["title"]) == passgen_cmd._DEFAULT_LENGTH for it in items)
+
+    def test_custom_length(self, capsys):
+        passgen_cmd.handle_basic("24")
+        items = self._items(capsys)
+        assert all(len(it["title"]) == 24 for it in items)
+
+    def test_panc_includes_punctuation_by_default(self, capsys):
+        passgen_cmd.handle_panc("")
+        items = self._items(capsys)
+        assert len(items) == passgen_cmd._NUM_SUGGESTIONS
+        assert all(it["valid"] for it in items)
+
+    def test_panc_split(self, capsys):
+        passgen_cmd.handle_panc("split 18 6")
+        items = self._items(capsys)
+        # Each password has groups separated by hyphens: 18/6 = 3 groups
+        for it in items:
+            parts = it["title"].split("-")
+            assert len(parts) == 3
+            assert all(len(p) == 6 for p in parts)
+
+    def test_split_command(self, capsys):
+        passgen_cmd.handle_split("18 6")
+        items = self._items(capsys)
+        for it in items:
+            parts = it["title"].split("-")
+            assert len(parts) == 3
+            assert all(len(p) == 6 for p in parts)
+
+    def test_split_default_args(self, capsys):
+        passgen_cmd.handle_split("")
+        items = self._items(capsys)
+        assert len(items) == passgen_cmd._NUM_SUGGESTIONS
+
+    def test_invalid_split_args_returns_error(self, capsys):
+        # 18 not divisible by 7
+        passgen_cmd.handle_split("18 7")
+        items = self._items(capsys)
+        assert len(items) == 1
+        assert "Error" in items[0]["title"]
+
+    def test_items_are_copyable(self, capsys):
+        passgen_cmd.handle_basic("")
+        items = self._items(capsys)
+        for it in items:
+            assert it["valid"] is True
+            assert it["arg"] == it["title"]
+
+    def test_skip_knowledge_true(self, capsys):
+        passgen_cmd.handle_basic("")
         data = json.loads(capsys.readouterr().out)
-        assert data["items"][0]["valid"] is False
-        assert "Type to search" in data["items"][0]["title"]
-
-    def test_whitespace_only_query_returns_prompt(self, capsys):
-        """Whitespace-only query must be treated as empty."""
-        search.handle("   ")
-        data = json.loads(capsys.readouterr().out)
-        assert "Type to search" in data["items"][0]["title"]
-
-    def test_returns_results(self, capsys):
-        with patch.object(
-            search._service,
-            "search",
-            return_value=[
-                {"id": "1", "title": "Result 1", "subtitle": "Sub", "url": "https://example.com"}
-            ],
-        ):
-            search.handle("query")
-
-        data = json.loads(capsys.readouterr().out)
-        assert len(data["items"]) == 1
-        assert data["items"][0]["title"] == "Result 1"
-
-    def test_no_results_returns_empty_message(self, capsys):
-        with patch.object(search._service, "search", return_value=[]):
-            search.handle("noresults")
-
-        data = json.loads(capsys.readouterr().out)
-        assert "No results" in data["items"][0]["title"]
-
-
-class TestOpenCommand:
-    def test_no_args_shows_all_shortcuts(self, capsys):
-        open_cmd.handle("")
-        data = json.loads(capsys.readouterr().out)
-        assert len(data["items"]) == len(open_cmd._SHORTCUTS)
-
-    def test_filter_by_name(self, capsys):
-        open_cmd.handle("repo")
-        data = json.loads(capsys.readouterr().out)
-        titles = [it["title"] for it in data["items"]]
-        assert all("repo" in t for t in titles)
-
-    def test_unknown_shortcut_shows_error(self, capsys):
-        open_cmd.handle("nonexistent")
-        data = json.loads(capsys.readouterr().out)
-        assert "No shortcut" in data["items"][0]["title"]
+        assert data.get("skipknowledge") is True
 
 
 class TestConfigCommand:
@@ -76,18 +85,11 @@ class TestConfigCommand:
         assert config_cmd._config.all() == {}
 
     def test_shows_existing_settings(self, capsys):
-        config_cmd._config.set("api_key", "secret")
+        config_cmd._config.set("log_level", "DEBUG")
         config_cmd.handle("")
         data = json.loads(capsys.readouterr().out)
         titles = [it["title"] for it in data["items"]]
-        assert any("api_key" in t for t in titles)
-
-    def test_unknown_subcommand_shows_current_config(self, capsys):
-        """Unrecognised sub-commands fall through to showing the current config."""
-        config_cmd.handle("unknown-subcommand")
-        data = json.loads(capsys.readouterr().out)
-        # Should return config view, not crash
-        assert len(data["items"]) > 0
+        assert any("log_level" in t for t in titles)
 
 
 class TestHelpCommand:

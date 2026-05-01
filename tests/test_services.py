@@ -1,33 +1,69 @@
-"""Tests for service layer."""
+"""Tests for the passgen service."""
 
 from __future__ import annotations
 
-from unittest.mock import patch
+import pytest
 
-from app.services.example_service import ExampleService
-
-_STUB = [{"id": "1", "title": "Result", "subtitle": "Sub", "url": "https://example.com"}]
+from app.services import passgen_service
 
 
-class TestExampleService:
-    def test_search_returns_results(self):
-        service = ExampleService()
-        with patch.object(service._client, "search", return_value=_STUB):
-            results = service.search("test")
-        assert isinstance(results, list)
-        assert len(results) > 0
+class TestGenerate:
+    def test_returns_correct_length(self):
+        pwd = passgen_service.generate("A-Za-z0-9", 18)
+        assert len(pwd) == 18
 
-    def test_search_caches_results(self):
-        service = ExampleService()
-        stub = [{"id": "1", "title": "T", "subtitle": "", "url": ""}]
-        with patch.object(service._client, "search", return_value=stub) as mock_search:
-            service.search("cached_query")
-            service.search("cached_query")
-            assert mock_search.call_count == 1  # second call uses cache
+    def test_characters_in_pattern(self):
+        import string
 
-    def test_search_different_queries_are_cached_separately(self):
-        service = ExampleService()
-        with patch.object(service._client, "search", return_value=[]) as mock_search:
-            service.search("query_a")
-            service.search("query_b")
-            assert mock_search.call_count == 2
+        pwd = passgen_service.generate("A-Za-z0-9", 100)
+        allowed = set(string.ascii_letters + string.digits)
+        assert all(c in allowed for c in pwd)
+
+    def test_explicit_chars(self):
+        pwd = passgen_service.generate("abc", 10)
+        assert all(c in "abc" for c in pwd)
+
+    def test_custom_length(self):
+        assert len(passgen_service.generate("A-Z", 32)) == 32
+
+    def test_punctuation_pattern(self):
+        pwd = passgen_service.generate("!-*", 20)
+        assert all(c in "!@#^&*" for c in pwd)
+
+    def test_invalid_range_raises(self):
+        with pytest.raises(ValueError):
+            passgen_service.generate("z-a", 10)
+
+    def test_double_dash_raises(self):
+        with pytest.raises(ValueError):
+            passgen_service.generate("a--z", 10)
+
+
+class TestGenerateSplit:
+    def test_correct_format(self):
+        pwd = passgen_service.generate_split("A-Za-z0-9", 18, 6)
+        parts = pwd.split("-")
+        assert len(parts) == 3
+        assert all(len(p) == 6 for p in parts)
+
+    def test_custom_by(self):
+        pwd = passgen_service.generate_split("A-Z", 12, 4)
+        parts = pwd.split("-")
+        assert len(parts) == 3
+        assert all(len(p) == 4 for p in parts)
+
+    def test_length_not_multiple_of_by_raises(self):
+        with pytest.raises(ValueError, match="multiple"):
+            passgen_service.generate_split("A-Z", 18, 7)
+
+    def test_length_less_than_by_raises(self):
+        with pytest.raises(ValueError, match=">="):
+            passgen_service.generate_split("A-Z", 3, 6)
+
+    def test_characters_in_pattern(self):
+        import string
+
+        pwd = passgen_service.generate_split("A-Za-z0-9", 18, 6)
+        chars = pwd.replace("-", "")
+        allowed = set(string.ascii_letters + string.digits)
+        assert all(c in allowed for c in chars)

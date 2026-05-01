@@ -1,4 +1,4 @@
-# AI_CONTEXT.md — alfred-workflow-template
+# AI_CONTEXT.md — alfred-password-generator
 
 > このファイルは開発憲章（`docs/dev-charter/`）をこのプロジェクト向けにまとめたものです。
 > AIツールはセッション開始時にこのファイルを読むことで、憲章全体を参照しなくても
@@ -181,8 +181,8 @@ Alfred Script Filter のレスポンス（JSON items）に適用するルール:
 
 OSS プロジェクトのため、以下の方式を採用:
 
-- **Buy Me a Coffee**: https://www.buymeacoffee.com/YOUR_USERNAME
-- **GitHub Sponsors**: リポジトリの Sponsors 機能（`.github/FUNDING.yml` 設定済み。`YOUR_USERNAME` を実際の値に置き換えること）
+- **Buy Me a Coffee**: https://www.buymeacoffee.com/y.marui
+- **GitHub Sponsors**: リポジトリの Sponsors 機能（`.github/FUNDING.yml` 設定済み）
 
 README.md の末尾に Buy Me a Coffee バッジを掲載する。
 マネタイズを本格検討する場合は `MONETIZATION.md` を作成し、このファイルに概要を追記する。
@@ -202,65 +202,6 @@ Alfred ワークフローは現時点では UI テキストのローカライゼ
 
 ## Project-Specific Rules
 
-### テンプレートユーザー向け初期セットアップ（INITIAL_SETUP）
-
-このリポジトリを GitHub テンプレートとして使用して新しいプロジェクトを作成した場合、AI は以下の手順を実行する。
-ユーザーから「テンプレートから始める」「初期セットアップ」などの指示を受けたときに実行する。
-
-1. **GitHub リポジトリ設定を最優先で適用する** — テンプレートからの作成時はすべての設定が初期化されるため   `docs/dev-charter/topics/GITHUB_SETTINGS.md` を読み、`gh` コマンドまたは GitHub UI から設定を適用する
-
-2. **README をリネームする**
-   - `README_TEMPLATE-jp.md` → `README-jp.md`（旧 `README-jp.md` を削除）
-   - `README_TEMPLATE.md` → `README.md`（旧 `README.md` を削除）
-
-3. **プレースホルダを置換する**（CI バッジ・dev-charter バッジを含む）
-   - `{user}` / `{repo}` → このプロジェクトのリポジトリ情報（`git remote get-url origin` から取得）
-   - `{keyword}` → Alfred のトリガーキーワード
-   - `{bmc_username}` → Buy Me a Coffee のユーザー名（`.github/FUNDING.yml` と合わせて置換）
-   - 対象ファイル: `README.md`、`README-jp.md`
-
-4. **cron スケジュールをランダム化する**（`.github/workflows/dev-charter-check.yml` が存在する場合）
-   - 複数プロジェクトが同時刻に実行されないよう、曜日・時・分をランダムな値に変更する
-
-### テンプレートからプロジェクトへの移行（TEMPLATE_MIGRATION）
-
-このテンプレートから新しいワークフローを作成した場合、AI は以下の手順で `workflow/info.plist` を更新する。
-ユーザーから「テンプレートから移行する」「プロジェクトをセットアップする」などの指示を受けたときに実行する。
-
-#### 取得方法
-
-| フィールド | 取得元 |
-|---|---|
-| `bundleid` | `com.github.<owner>.<repo>` — `git remote get-url origin` から owner/repo を取得 |
-| `description` | `gh repo view <owner>/<repo> --json description --jq '.description'` |
-| `createdby` | `git config user.name` |
-| `category` | ユーザーに選択肢を提示して確認する（下記参照） |
-| `webaddress` | `https://github.com/<owner>/<repo>` |
-
-#### category の選択肢
-
-Alfred が受け付ける category 文字列:
-
-- `Tools & Utilities`
-- `Internet`
-- `Files & Folders`
-- `Productivity`
-- `Communication`
-- `Music & Audio`
-- `System`
-- `Games`
-- `Academic`
-- `Development`
-
-ユーザーにワークフローの用途を聞き、最も適切な category を提案して確認を取る。
-
-#### 更新手順
-
-`/usr/libexec/PlistBuddy` を使って `workflow/info.plist` を直接編集する。
-`category` キーは info.plist に存在しない場合があるため、存在しなければ `Add`、存在すれば `Set` を使う。
-
----
-
 ### アーキテクチャ制約
 
 - `workflow/scripts/entry.py` は Alfred が実行する**唯一のファイル**。ビジネスロジックを書かない
@@ -271,8 +212,8 @@ Alfred が受け付ける category 文字列:
 
 ### テスト規約
 
-- `src/app/`（commands / services / clients）をテスト対象とする — 純粋 Python
-- `ApiClient` 内の外部 API 呼び出しはモックする。テストで実際の HTTP 通信をしない
+- `src/app/`（commands / services）をテスト対象とする — 純粋 Python
+- 外部 I/O は行わない（`passgen_service` は stdlib のみ使用）
 - `conftest.py` が Alfred 環境変数を tmp ディレクトリに自動設定する
 - Alfred SDK ヘルパーのテストは `tests/test_alfred.py`
 

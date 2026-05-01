@@ -7,18 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] - 2024-01-01
+## [1.0.0] - 2026-05-02
 
 ### Added
 
-- Initial release of the Alfred Workflow Template
+- Password generation with customizable length and character set
+- Four modes: basic, panc (with punctuation), split, panc split
 - Alfred SDK: `response`, `cache`, `config`, `logger`, `router`, `safe_run`
-- Command-based UX: `search`, `open`, `config`, `help`
+- Shows 5 password suggestions per query in Alfred
+- Clipboard history toggle via Config Builder
 - Vendor packaging via `scripts/vendor.sh`
 - Build pipeline via `scripts/build.sh`
 - GitHub Actions CI (lint, test, build)
 - GitHub Actions Release (tag → `.alfredworkflow` → GitHub Release)
 - Full pytest test suite
 
-[Unreleased]: https://github.com/yourname/alfred-workflow-template/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/yourname/alfred-workflow-template/releases/tag/v0.1.0
+[Unreleased]: https://github.com/y-marui/alfred-password-generator/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/y-marui/alfred-password-generator/releases/tag/v1.0.0
