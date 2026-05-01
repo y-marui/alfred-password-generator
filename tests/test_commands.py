@@ -26,16 +26,26 @@ class TestPassgenCommand:
         passgen_cmd.handle_panc("")
         items = self._items(capsys)
         assert len(items) == passgen_cmd._NUM_SUGGESTIONS
-        assert all(it["valid"] for it in items)
+        all_chars = "".join(it["title"] for it in items)
+        punct = set("!@#^&*")
+        # 5 * 18 = 90 chars from a 68-char charset; probability of zero punct is negligible
+        assert any(c in punct for c in all_chars)
 
     def test_panc_split(self, capsys):
         passgen_cmd.handle_panc("split 18 6")
         items = self._items(capsys)
-        # Each password has groups separated by hyphens: 18/6 = 3 groups
         for it in items:
             parts = it["title"].split("-")
             assert len(parts) == 3
             assert all(len(p) == 6 for p in parts)
+
+    def test_panc_split_no_args(self, capsys):
+        passgen_cmd.handle_panc("split")
+        items = self._items(capsys)
+        assert len(items) == passgen_cmd._NUM_SUGGESTIONS
+        for it in items:
+            parts = it["title"].split("-")
+            assert len(parts) == passgen_cmd._DEFAULT_LENGTH // passgen_cmd._DEFAULT_BY
 
     def test_split_command(self, capsys):
         passgen_cmd.handle_split("18 6")
@@ -50,12 +60,58 @@ class TestPassgenCommand:
         items = self._items(capsys)
         assert len(items) == passgen_cmd._NUM_SUGGESTIONS
 
-    def test_invalid_split_args_returns_error(self, capsys):
-        # 18 not divisible by 7
+    def test_split_custom_pattern(self, capsys):
+        passgen_cmd.handle_split("12 4 A-Z")
+        items = self._items(capsys)
+        for it in items:
+            chars = it["title"].replace("-", "")
+            assert all(c.isupper() for c in chars)
+            assert len(chars) == 12
+
+    def test_invalid_split_ratio_returns_error(self, capsys):
         passgen_cmd.handle_split("18 7")
         items = self._items(capsys)
         assert len(items) == 1
         assert "Error" in items[0]["title"]
+
+    def test_zero_by_returns_error(self, capsys):
+        passgen_cmd.handle_split("18 0")
+        items = self._items(capsys)
+        assert len(items) == 1
+        assert "Error" in items[0]["title"]
+
+    def test_negative_by_returns_error(self, capsys):
+        passgen_cmd.handle_split("18 -6")
+        items = self._items(capsys)
+        assert len(items) == 1
+        assert "Error" in items[0]["title"]
+
+    def test_invalid_pattern_returns_error(self, capsys):
+        passgen_cmd.handle_basic("18 z-a")
+        items = self._items(capsys)
+        assert len(items) == 1
+        assert "Error" in items[0]["title"]
+
+    def test_panc_invalid_pattern_returns_error(self, capsys):
+        passgen_cmd.handle_panc("18 z-a")
+        items = self._items(capsys)
+        assert len(items) == 1
+        assert "Error" in items[0]["title"]
+
+    def test_trailing_dash_pattern_returns_error(self, capsys):
+        passgen_cmd.handle_basic("18 A-Z-")
+        items = self._items(capsys)
+        assert len(items) == 1
+        assert "Error" in items[0]["title"]
+
+    def test_split_partial_invalid_by_uses_defaults(self, capsys):
+        # "abc" fails int() for by → falls back to default by=6; length=18 is parsed
+        passgen_cmd.handle_split("18 abc")
+        items = self._items(capsys)
+        for it in items:
+            parts = it["title"].split("-")
+            assert len(parts) == 3
+            assert all(len(p) == 6 for p in parts)
 
     def test_items_are_copyable(self, capsys):
         passgen_cmd.handle_basic("")

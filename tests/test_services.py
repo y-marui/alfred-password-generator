@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import string
+
 import pytest
 
 from app.services import passgen_service
@@ -13,8 +15,6 @@ class TestGenerate:
         assert len(pwd) == 18
 
     def test_characters_in_pattern(self):
-        import string
-
         pwd = passgen_service.generate("A-Za-z0-9", 100)
         allowed = set(string.ascii_letters + string.digits)
         assert all(c in allowed for c in pwd)
@@ -30,6 +30,14 @@ class TestGenerate:
         pwd = passgen_service.generate("!-*", 20)
         assert all(c in "!@#^&*" for c in pwd)
 
+    def test_zero_length_raises(self):
+        with pytest.raises(ValueError, match="positive"):
+            passgen_service.generate("A-Z", 0)
+
+    def test_negative_length_raises(self):
+        with pytest.raises(ValueError, match="positive"):
+            passgen_service.generate("A-Z", -1)
+
     def test_invalid_range_raises(self):
         with pytest.raises(ValueError):
             passgen_service.generate("z-a", 10)
@@ -37,6 +45,14 @@ class TestGenerate:
     def test_double_dash_raises(self):
         with pytest.raises(ValueError):
             passgen_service.generate("a--z", 10)
+
+    def test_trailing_dash_raises(self):
+        with pytest.raises(ValueError, match="trailing"):
+            passgen_service.generate("A-Z-", 10)
+
+    def test_cross_class_range_raises(self):
+        with pytest.raises(ValueError):
+            passgen_service.generate("A-z", 10)
 
 
 class TestGenerateSplit:
@@ -52,6 +68,11 @@ class TestGenerateSplit:
         assert len(parts) == 3
         assert all(len(p) == 4 for p in parts)
 
+    def test_single_group(self):
+        pwd = passgen_service.generate_split("A-Z", 6, 6)
+        assert "-" not in pwd
+        assert len(pwd) == 6
+
     def test_length_not_multiple_of_by_raises(self):
         with pytest.raises(ValueError, match="multiple"):
             passgen_service.generate_split("A-Z", 18, 7)
@@ -60,9 +81,19 @@ class TestGenerateSplit:
         with pytest.raises(ValueError, match=">="):
             passgen_service.generate_split("A-Z", 3, 6)
 
-    def test_characters_in_pattern(self):
-        import string
+    def test_zero_by_raises(self):
+        with pytest.raises(ValueError, match="positive"):
+            passgen_service.generate_split("A-Z", 18, 0)
 
+    def test_negative_by_raises(self):
+        with pytest.raises(ValueError, match="positive"):
+            passgen_service.generate_split("A-Z", 18, -6)
+
+    def test_zero_length_raises(self):
+        with pytest.raises(ValueError, match="positive"):
+            passgen_service.generate_split("A-Z", 0, 6)
+
+    def test_characters_in_pattern(self):
         pwd = passgen_service.generate_split("A-Za-z0-9", 18, 6)
         chars = pwd.replace("-", "")
         allowed = set(string.ascii_letters + string.digits)
