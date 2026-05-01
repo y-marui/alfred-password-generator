@@ -6,19 +6,6 @@
 	<string>com.github.y-marui.alfred-password-generator</string>
 	<key>connections</key>
 	<dict>
-		<key>69B5A1A8-DA0D-4BEA-9263-A34590DC70C2</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>0412B2E6-130D-4C14-AE41-FA7CBE0002A6</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<true/>
-			</dict>
-		</array>
 		<key>0412B2E6-130D-4C14-AE41-FA7CBE0002A6</key>
 		<array>
 			<dict>
@@ -36,6 +23,19 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>4F78A934-A8D7-45FA-AF77-4CFDC3B41398</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<true/>
+			</dict>
+		</array>
+		<key>69B5A1A8-DA0D-4BEA-9263-A34590DC70C2</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>0412B2E6-130D-4C14-AE41-FA7CBE0002A6</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -195,17 +195,24 @@ Characters can be listed directly (e.g. ABCabc012) or as ranges (e.g. A-Za-z0-9)
 Punctuation range: !-* expands to !@#^&amp;*</string>
 	<key>uidata</key>
 	<dict>
-		<key>69B5A1A8-DA0D-4BEA-9263-A34590DC70C2</key>
-		<dict>
-			<key>xpos</key>
-			<real>50</real>
-			<key>ypos</key>
-			<real>50</real>
-		</dict>
 		<key>0412B2E6-130D-4C14-AE41-FA7CBE0002A6</key>
 		<dict>
 			<key>xpos</key>
 			<real>300</real>
+			<key>ypos</key>
+			<real>50</real>
+		</dict>
+		<key>4F78A934-A8D7-45FA-AF77-4CFDC3B41398</key>
+		<dict>
+			<key>xpos</key>
+			<real>500</real>
+			<key>ypos</key>
+			<real>100</real>
+		</dict>
+		<key>69B5A1A8-DA0D-4BEA-9263-A34590DC70C2</key>
+		<dict>
+			<key>xpos</key>
+			<real>50</real>
 			<key>ypos</key>
 			<real>50</real>
 		</dict>
@@ -214,14 +221,7 @@ Punctuation range: !-* expands to !@#^&amp;*</string>
 			<key>xpos</key>
 			<real>500</real>
 			<key>ypos</key>
-			<real>0</real>
-		</dict>
-		<key>4F78A934-A8D7-45FA-AF77-4CFDC3B41398</key>
-		<dict>
-			<key>xpos</key>
-			<real>500</real>
-			<key>ypos</key>
-			<real>100</real>
+			<real>0.0</real>
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
