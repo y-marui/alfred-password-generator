@@ -20,7 +20,7 @@
 
 Alfred を開いて `passgen` に続けてスペースを入力します。
 
-### 基本 (default)
+### Basic (default)
 
 ```
 passgen [length] [pattern]
@@ -28,7 +28,7 @@ passgen [length] [pattern]
 
 `length` のデフォルトは 18、`pattern` のデフォルトは `A-Za-z0-9`。
 
-### 記号付き (panc)
+### With punctuation (panc)
 
 ```
 passgen panc [length] [pattern]
@@ -36,7 +36,7 @@ passgen panc [length] [pattern]
 
 デフォルトパターンが `A-Za-z0-9!-*`（`!@#^&*` を含む）になります。
 
-### グループ分割 (split)
+### Split into groups (split)
 
 ```
 passgen split [length] [by] [pattern]
@@ -45,7 +45,7 @@ passgen split [length] [by] [pattern]
 `length` のデフォルトは 18、`by` のデフォルトは 6（ハイフン区切り: `xxxxxx-xxxxxx-xxxxxx`）。
 `length` は `by` の倍数である必要があります。
 
-### 記号付きグループ分割 (panc split)
+### Split with punctuation (panc split)
 
 ```
 passgen panc split [length] [by] [pattern]
@@ -55,7 +55,7 @@ passgen panc split [length] [by] [pattern]
 
 Enter キーで選択したパスワードをクリップボードにコピーします。
 
-## パターン構文
+## Pattern syntax
 
 文字は直接列挙（例: `ABCabc012!@#`）またはレンジ指定（例: `A-Za-z0-9`）で指定できます。
 
