@@ -270,7 +270,7 @@ Alfred からスクリプトを実行する際は `use_uv` 変数で実行方法
 
 ### Dependency Management
 
-- ランタイム依存 → `requirements.txt` → `workflow/vendor/` にベンダリング（`make vendor`）
+- ランタイム依存 → `vendor-requirements.txt` → `workflow/vendor/` にベンダリング（`make vendor`）
 - 開発依存 → `pyproject.toml [dependency-groups]`（uv 推奨形式）
 - ランタイム依存は最小限に保つ（パッケージ追加 = ワークフローサイズ増加）
 

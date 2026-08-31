@@ -70,7 +70,7 @@ router.register("my")(my_cmd.handle)
 
 ## Adding a Third-Party Dependency
 
-1. Add the package to `requirements.txt`.
+1. Add the package to `vendor-requirements.txt`.
 2. Run `make vendor` to install into `workflow/vendor/`.
 3. Import normally in your code — `entry.py` adds the vendor path to `sys.path`.
 
