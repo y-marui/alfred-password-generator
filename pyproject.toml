@@ -3,7 +3,7 @@ name = "alfred-password-generator"
 version = "1.0.0"
 description = "Alfred workflow to generate passwords with customizable length and character set"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 # Runtime dependencies - also add to vendor-requirements.txt for vendor install
 dependencies = []
