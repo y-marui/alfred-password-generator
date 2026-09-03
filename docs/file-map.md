@@ -16,13 +16,18 @@ cmd/password-generator-alfred/main.go
   └─ dispatch(query)                                [recovers panics into an error item]
        └─ internal/passgencmd.Dispatch(query)
             ├─ handleBasic(args)                     [default]
-            │    └─ internal/passgen.Generate(pattern, length)
+            │    └─ internal/passgen.Generate(pattern, length, maxAttempts)
             ├─ handlePanc(args)
             │    └─ internal/passgen.Generate / GenerateSplit
             ├─ handleSplit(args)
-            │    └─ internal/passgen.GenerateSplit(pattern, length, by)
+            │    └─ internal/passgen.GenerateSplit(pattern, length, by, maxAttempts)
+            ├─ handlePin(args) / handleCode(args)
+            │    └─ internal/passgen.Generate(patternDigits, ...)
             └─ handleHelp()
 ```
+
+`maxAttempts()` reads the `max_attempts` Config Builder variable and feeds every
+`passgen.Generate`/`GenerateSplit` call above (including inside `showOverview`).
 
 ## Package Dependency Table
 
@@ -37,5 +42,5 @@ cmd/password-generator-alfred/main.go
 
 | File | Tests |
 |---|---|
-| `internal/passgen/passgen_test.go` | `Generate`, `GenerateSplit`, pattern expansion (valid/invalid ranges) |
-| `internal/passgencmd/passgencmd_test.go` | Command dispatch (passgen, panc, split, help), overview mode, error items |
+| `internal/passgen/passgen_test.go` | `Generate`, `GenerateSplit`, pattern expansion (valid/invalid ranges), class-diversity retry |
+| `internal/passgencmd/passgencmd_test.go` | Command dispatch (passgen, panc, split, pin, code, help), overview mode, error items, `maxAttempts()` env fallback |

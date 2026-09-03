@@ -1,6 +1,7 @@
 package passgencmd
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 
@@ -25,9 +26,15 @@ func TestLengthOnlyShowsOverview(t *testing.T) {
 	if len(resp.Items) != len(overview) {
 		t.Fatalf("got %d items, want %d", len(resp.Items), len(overview))
 	}
-	for _, it := range resp.Items {
-		if !strings.Contains(it.Subtitle, "24") {
-			t.Errorf("subtitle %q does not mention length 24", it.Subtitle)
+	// Entries with a fixed length (pin/code) ignore the requested overview
+	// length and report their own instead.
+	for i, it := range resp.Items {
+		want := "24"
+		if fl := overview[i].fixedLength; fl > 0 {
+			want = strconv.Itoa(fl)
+		}
+		if !strings.Contains(it.Subtitle, want) {
+			t.Errorf("subtitle %q does not mention length %s", it.Subtitle, want)
 		}
 	}
 }
@@ -200,6 +207,70 @@ func TestSkipKnowledgeTrue(t *testing.T) {
 	resp := Dispatch("")
 	if !resp.SkipKnowledge {
 		t.Error("expected SkipKnowledge to be true")
+	}
+}
+
+func TestPinDefaultsToFourDigits(t *testing.T) {
+	resp := Dispatch("pin")
+	if len(resp.Items) != numSuggestions {
+		t.Fatalf("got %d items, want %d", len(resp.Items), numSuggestions)
+	}
+	for _, it := range resp.Items {
+		if len([]rune(it.Title)) != pinLength {
+			t.Errorf("pin %q has length %d, want %d", it.Title, len([]rune(it.Title)), pinLength)
+		}
+		for _, c := range it.Title {
+			if c < '0' || c > '9' {
+				t.Errorf("pin %q contains non-digit character %q", it.Title, c)
+			}
+		}
+	}
+}
+
+func TestCodeDefaultsToSixDigits(t *testing.T) {
+	resp := Dispatch("code")
+	if len(resp.Items) != numSuggestions {
+		t.Fatalf("got %d items, want %d", len(resp.Items), numSuggestions)
+	}
+	for _, it := range resp.Items {
+		if len([]rune(it.Title)) != codeLength {
+			t.Errorf("code %q has length %d, want %d", it.Title, len([]rune(it.Title)), codeLength)
+		}
+	}
+}
+
+func TestPinCustomLength(t *testing.T) {
+	resp := Dispatch("pin 8")
+	for _, it := range resp.Items {
+		if len([]rune(it.Title)) != 8 {
+			t.Errorf("pin %q has length %d, want 8", it.Title, len([]rune(it.Title)))
+		}
+	}
+}
+
+func TestOverviewIncludesPinAndCode(t *testing.T) {
+	resp := Dispatch("")
+	joined := subtitles(resp)
+	for _, want := range []string{"pin", "code"} {
+		if !strings.Contains(joined, want) {
+			t.Errorf("expected a subtitle containing %q, got %v", want, joined)
+		}
+	}
+}
+
+func TestMaxAttemptsFromEnv(t *testing.T) {
+	t.Setenv("max_attempts", "3")
+	if got := maxAttempts(); got != 3 {
+		t.Errorf("maxAttempts() = %d, want 3", got)
+	}
+}
+
+func TestMaxAttemptsFallsBackOnInvalidEnv(t *testing.T) {
+	for _, v := range []string{"", "0", "-5", "not-a-number"} {
+		t.Setenv("max_attempts", v)
+		if got := maxAttempts(); got != defaultMaxAttempts {
+			t.Errorf("maxAttempts() with max_attempts=%q = %d, want default %d", v, got, defaultMaxAttempts)
+		}
 	}
 }
 

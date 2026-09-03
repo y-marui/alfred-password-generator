@@ -12,8 +12,13 @@ import (
 // Punctuation is the character set the "!-*" range expands to.
 const Punctuation = "!@#^&*"
 
+// numClasses is len(ranges), fixed as a constant so it can size arrays.
+const numClasses = 4
+
 // ranges are the character classes a "-" range may span within. A range
 // cannot mix characters from two different classes (e.g. "A-z" is invalid).
+// A character outside all of these (e.g. the "-" joiner GenerateSplit
+// inserts) belongs to no class and never affects the diversity check below.
 var ranges = []string{
 	"abcdefghijklmnopqrstuvwxyz",
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -74,18 +79,63 @@ func ExpandPattern(pattern string) ([]rune, error) {
 	return out, nil
 }
 
-func rangeContaining(a, b rune) string {
-	for _, r := range ranges {
-		if strings.ContainsRune(r, a) && strings.ContainsRune(r, b) {
-			return r
+// classOf returns the index into ranges that c belongs to, or -1 if c is
+// outside every defined class (e.g. a literal "-" joiner).
+func classOf(c rune) int {
+	for i, r := range ranges {
+		if strings.ContainsRune(r, c) {
+			return i
 		}
 	}
-	return ""
+	return -1
+}
+
+func rangeContaining(a, b rune) string {
+	i := classOf(a)
+	if i < 0 || !strings.ContainsRune(ranges[i], b) {
+		return ""
+	}
+	return ranges[i]
+}
+
+// requiredClasses reports, for each class in ranges, whether chars contains
+// at least one character from it — i.e. which classes a generated password
+// must represent to be considered diverse.
+func requiredClasses(chars []rune) [numClasses]bool {
+	var required [numClasses]bool
+	for _, c := range chars {
+		if i := classOf(c); i >= 0 {
+			required[i] = true
+		}
+	}
+	return required
+}
+
+// satisfiesClasses reports whether s contains at least one character from
+// every class flagged in required.
+func satisfiesClasses(s string, required [numClasses]bool) bool {
+	var present [numClasses]bool
+	for _, c := range s {
+		if i := classOf(c); i >= 0 {
+			present[i] = true
+		}
+	}
+	for i, need := range required {
+		if need && !present[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // Generate returns a cryptographically secure random password of the given
-// length, drawn uniformly from pattern's expanded character set.
-func Generate(pattern string, length int) (string, error) {
+// length, drawn uniformly from pattern's expanded character set. If that
+// character set spans multiple classes (lowercase/uppercase/digit/punctuation),
+// Generate retries — up to maxAttempts times — until the result contains at
+// least one character from each class, falling back to the last attempt if
+// none qualifies within that budget (e.g. because length is too short for
+// the number of classes involved). maxAttempts below 1 is treated as 1.
+func Generate(pattern string, length, maxAttempts int) (string, error) {
 	if length <= 0 {
 		return "", fmt.Errorf("length must be a positive integer, got %d", length)
 	}
@@ -96,20 +146,26 @@ func Generate(pattern string, length int) (string, error) {
 	if len(chars) == 0 {
 		return "", fmt.Errorf("pattern '%s' produces no characters", pattern)
 	}
-	out := make([]rune, length)
-	for i := range out {
-		c, err := secureChoice(chars)
+	required := requiredClasses(chars)
+
+	var pwd string
+	for attempt := 0; attempt < max(maxAttempts, 1); attempt++ {
+		pwd, err = generateOnce(chars, length)
 		if err != nil {
 			return "", err
 		}
-		out[i] = c
+		if satisfiesClasses(pwd, required) {
+			break
+		}
 	}
-	return string(out), nil
+	return pwd, nil
 }
 
 // GenerateSplit returns a secure password split into groups of by
-// characters, joined by hyphens (e.g. "xxxxxx-xxxxxx-xxxxxx").
-func GenerateSplit(pattern string, length, by int) (string, error) {
+// characters, joined by hyphens (e.g. "xxxxxx-xxxxxx-xxxxxx"). The same
+// class-diversity retry as Generate applies to the full password (the "-"
+// joiners are never part of any class, so they never affect the check).
+func GenerateSplit(pattern string, length, by, maxAttempts int) (string, error) {
 	if by <= 0 {
 		return "", fmt.Errorf("by must be a positive integer, got %d", by)
 	}
@@ -129,20 +185,37 @@ func GenerateSplit(pattern string, length, by int) (string, error) {
 	if len(chars) == 0 {
 		return "", fmt.Errorf("pattern '%s' produces no characters", pattern)
 	}
+	required := requiredClasses(chars)
 
-	groups := make([]string, length/by)
-	for g := range groups {
-		group := make([]rune, by)
-		for i := range group {
-			c, err := secureChoice(chars)
+	var result string
+	for attempt := 0; attempt < max(maxAttempts, 1); attempt++ {
+		groups := make([]string, length/by)
+		for g := range groups {
+			part, err := generateOnce(chars, by)
 			if err != nil {
 				return "", err
 			}
-			group[i] = c
+			groups[g] = part
 		}
-		groups[g] = string(group)
+		result = strings.Join(groups, "-")
+		if satisfiesClasses(result, required) {
+			break
+		}
 	}
-	return strings.Join(groups, "-"), nil
+	return result, nil
+}
+
+// generateOnce draws length characters uniformly at random from chars.
+func generateOnce(chars []rune, length int) (string, error) {
+	out := make([]rune, length)
+	for i := range out {
+		c, err := secureChoice(chars)
+		if err != nil {
+			return "", err
+		}
+		out[i] = c
+	}
+	return string(out), nil
 }
 
 // secureChoice picks a uniformly random rune from chars using a

@@ -240,6 +240,7 @@ Value is passed as an integer string: `os.Getenv("result_count")` → `"5"`.
 | Variable | Type | Default | Description |
 |---|---|---|---|
 | `history` | checkbox | `false` | Save generated passwords to Alfred's clipboard history |
+| `max_attempts` | textfield | `100` | Max retries for the character-class diversity guarantee (`docs/specification.md`) |
 
 ## References
 

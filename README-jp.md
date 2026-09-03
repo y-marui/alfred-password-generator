@@ -53,7 +53,26 @@ passgen panc split [length] [by] [pattern]
 
 記号を含みつつグループ分割します。
 
+### PIN
+
+```
+passgen pin [length]
+```
+
+デフォルトの長さは 4、パターンは数字（`0-9`）固定です。
+
+### Code
+
+```
+passgen code [length]
+```
+
+デフォルトの長さは 6、パターンは数字（`0-9`）固定です。
+
 Enter キーで選択したパスワードをクリップボードにコピーします。
+
+生成されるパスワードは、そのパターンに含まれる各文字クラス（小文字・大文字・数字・記号）
+から必ず1文字以上含むことが保証されます（[Configuration](#configuration) 参照）。
 
 ## Pattern syntax
 
@@ -77,6 +96,7 @@ Alfred の設定（`⌘,`）から以下の項目を設定できます。
 | 設定 | デフォルト | 説明 |
 |---|---|---|
 | Clipboard History | OFF | パスワードを Alfred のクリップボード履歴に保存する（セキュリティ上 OFF 推奨） |
+| Max Generation Attempts | 100 | 文字クラスの組み合わせを得るための最大リトライ回数（[Pattern syntax](#pattern-syntax) 参照） |
 
 ## Installation
 

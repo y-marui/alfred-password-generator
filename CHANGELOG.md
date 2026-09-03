@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `pin` and `code` commands (`passgen pin [length]` / `passgen code [length]`) generating
+  numeric-only passwords, 4 and 6 digits by default respectively; also added to the
+  bare-length overview alongside basic/panc/split/panc split.
+- Every generated password now retries generation until it contains at least one
+  character from each class present in its pattern (lowercase/uppercase/digit/punctuation),
+  instead of leaving that to chance. For split passwords the check ignores the `-`
+  separators. The retry budget is capped by the new `max_attempts` Config Builder
+  setting (default 100); if no attempt qualifies within it, the last one is used.
+
 ### Changed
 
 - **Breaking (implementation):** Reimplemented the workflow in Go

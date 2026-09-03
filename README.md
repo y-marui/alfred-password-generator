@@ -51,7 +51,27 @@ Default length is 18, default group size is 6 (e.g. `xxxxxx-xxxxxx-xxxxxx`).
 passgen panc split [length] [by] [pattern]
 ```
 
+### PIN
+
+```
+passgen pin [length]
+```
+
+Default length is 4, pattern is fixed to digits (`0-9`).
+
+### Code
+
+```
+passgen code [length]
+```
+
+Default length is 6, pattern is fixed to digits (`0-9`).
+
 Press Enter to copy the selected password to the clipboard.
+
+Every generated password is guaranteed to contain at least one character from
+each class present in its pattern (lowercase / uppercase / digit / punctuation) —
+see [Configuration](#configuration).
 
 ## Pattern syntax
 
@@ -75,6 +95,7 @@ Access settings via Alfred Preferences (`⌘,`).
 | Setting | Default | Description |
 |---|---|---|
 | Clipboard History | OFF | Save passwords to Alfred's clipboard history (not recommended for security) |
+| Max Generation Attempts | 100 | Max retries to get a mix of character classes in the result (see [Pattern syntax](#pattern-syntax)) |
 
 ## Installation
 

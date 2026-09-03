@@ -46,9 +46,12 @@ library (`crypto/rand`, `strconv`, `strings`).
 Alfred 5 の Configuration Builder は `info.plist` の `userconfigurationconfig` キーで定義する。
 利用可能な全型・各キーの詳細は [`docs/configuration-builder.md`](configuration-builder.md) を参照。
 
-This workflow declares one variable, `history` (checkbox) — it controls
+This workflow declares two variables: `history` (checkbox) — it controls
 which of the two Clipboard Output nodes the Conditional node routes to
-(`workflow/info.plist`), and is never read by the Go binary itself.
+(`workflow/info.plist`), and is never read by the Go binary itself — and
+`max_attempts` (textfield) — the character-class diversity retry budget
+`internal/passgencmd.maxAttempts()` reads via `os.Getenv`
+(`docs/specification.md#character-class-diversity`).
 
 ### Passing variables
 
