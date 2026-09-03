@@ -13,6 +13,17 @@ Conditional/Clipboard Output nodes — no script is involved in that step; see
 `scripts/build-workflow.sh` packages the binary with `workflow/info.plist`
 and `workflow/icon.png` into a `.alfredworkflow`.
 
+This structure — a thin `cmd/` entry point over independently testable
+`internal/` packages, no generic command-router abstraction, Script Filter
+JSON via a small `scriptfilter` package — deliberately matches
+[y-marui/alfred-clean-invisible-text](https://github.com/y-marui/alfred-clean-invisible-text)
+and [y-marui/alfred-markdown-ref](https://github.com/y-marui/alfred-markdown-ref),
+this author's other Alfred Workflows already implemented in Go. This workflow
+itself was originally a Python implementation
+([`src/alfred`/`src/app`](https://github.com/y-marui/alfred-password-generator/tree/v1.0.0/src));
+see `CHANGELOG.md`'s `[Unreleased]` entry for what changed and why in that
+rewrite.
+
 ## Entry Points
 
 - `cmd/password-generator-alfred` — a single command, no subcommands. The
