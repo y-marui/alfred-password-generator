@@ -1,4 +1,4 @@
-.PHONY: build test lint fmt build-workflow precommit update-charter
+.PHONY: build test lint fmt build-workflow precommit update-charter update-workflow-notes
 
 build:
 	go build ./...
@@ -25,14 +25,7 @@ precommit:
 	pre-commit run --all-files
 
 update-charter:
-	git remote | grep -q '^dev-charter$$' || \
-	  git remote add dev-charter https://github.com/y-marui/dev-charter
-	git fetch dev-charter
-	@set -e; \
-	STASHED=0; \
-	if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$$(git ls-files --others --exclude-standard)" ]; then \
-		git stash push -u -m "update-charter"; \
-		STASHED=1; \
-	fi; \
-	git subtree pull --prefix=docs/dev-charter dev-charter main --squash; \
-	if [ "$$STASHED" = "1" ]; then git stash pop; fi
+	curl -fsSL https://raw.githubusercontent.com/y-marui/dev-charter/main/scripts/install.sh | CHARTER_UPDATE_ONLY=1 bash
+
+update-workflow-notes:
+	curl -fsSL https://raw.githubusercontent.com/y-marui/alfred-workflow-template/main/scripts/install-workflow-notes.sh | bash
