@@ -13,19 +13,15 @@ see [DEVELOPING.md](DEVELOPING.md).
 ## Release Process
 
 ```bash
-# 1. Update version in pyproject.toml
+# 1. Update version in workflow/info.plist
 # 2. Update CHANGELOG.md
-git add pyproject.toml CHANGELOG.md
+git add workflow/info.plist CHANGELOG.md
 git commit -m "chore: release v1.2.3"
 
 # 3. Tag and push
 git tag v1.2.3
 git push origin main --tags
 # GitHub Actions builds .alfredworkflow and creates a GitHub Release
-
-# Manual release (if needed)
-make build
-make release
 ```
 
 ## Security
@@ -51,10 +47,11 @@ This is a workflow template. Common areas of concern:
 
 - **Credential handling** — never store secrets in `workflow/info.plist` or
   committed files; use Alfred's built-in encrypted keychain instead.
-- **Input sanitization** — Alfred query strings are passed to `entry.py`; they
-  must not be interpolated into shell commands or SQL without sanitization.
-- **Dependency security** — vendored packages in `workflow/vendor/` should be
-  kept up-to-date; dependabot monitors `.github/workflows/` automatically.
+- **Input sanitization** — Alfred query strings are passed to
+  `cmd/password-generator-alfred`; they must not be interpolated into shell
+  commands or SQL without sanitization.
+- **Dependency security** — this project has no third-party Go dependencies
+  by design; dependabot monitors `.github/workflows/` automatically.
 
 ### Automated Security Checks
 

@@ -7,55 +7,40 @@
 
 | File | Role |
 |---|---|
-| `workflow/scripts/entry.py` | Alfred executes this file — the sole entry point |
-| `src/app/core.py` | Wires Router to command handlers |
+| `cmd/password-generator-alfred/main.go` | Alfred executes this binary — the sole entry point |
 
 ## Call Flow
 
 ```
-workflow/scripts/entry.py
-  └─ alfred.safe_run.safe_run(main)
-       └─ app.core.run(query)
-            └─ alfred.router.Router.dispatch(query)
-                 ├─ app.commands.passgen_cmd.handle_basic(args)   [default]
-                 │    └─ app.services.passgen_service.generate(pattern, length)
-                 ├─ app.commands.passgen_cmd.handle_panc(args)
-                 │    └─ passgen_service.generate / generate_split
-                 ├─ app.commands.passgen_cmd.handle_split(args)
-                 │    └─ app.services.passgen_service.generate_split(pattern, length, by)
-                 ├─ app.commands.config_cmd.handle(args)
-                 │    └─ alfred.config.Config.all/reset
-                 └─ app.commands.help_cmd.handle(args)
+cmd/password-generator-alfred/main.go
+  └─ dispatch(query)                                [recovers panics into an error item]
+       └─ internal/passgencmd.Dispatch(query)
+            ├─ handleBasic(args)                     [default]
+            │    └─ internal/passgen.Generate(pattern, length, maxAttempts)
+            ├─ handlePanc(args)
+            │    └─ internal/passgen.Generate / GenerateSplit
+            ├─ handleSplit(args)
+            │    └─ internal/passgen.GenerateSplit(pattern, length, by, maxAttempts)
+            ├─ handlePin(args) / handleCode(args)
+            │    └─ internal/passgen.Generate(patternDigits, ...)
+            └─ handleHelp()
 ```
 
-## Module Dependency Table
+`maxAttempts()` reads the `max_attempts` Config Builder variable and feeds every
+`passgen.Generate`/`GenerateSplit` call above (including inside `showOverview`).
 
-### Alfred SDK (`src/alfred/`)
+## Package Dependency Table
 
-| Module | Imports from | Notes |
+| Package | Imports from | Notes |
 |---|---|---|
-| `response.py` | stdlib only | Emits Script Filter JSON to stdout |
-| `router.py` | stdlib only | Parses query string, dispatches to handler |
-| `safe_run.py` | `alfred.response` | Wraps `main()` to catch uncaught exceptions |
-| `cache.py` | stdlib only | TTL disk cache; reads `alfred_workflow_cache` env var |
-| `config.py` | stdlib only | Persistent JSON store; reads `alfred_workflow_data` env var |
-| `logger.py` | stdlib only | File logger to `~/Library/Logs/Alfred/Workflow/` |
+| `internal/scriptfilter` | stdlib only | Alfred Script Filter JSON types (`Item`, `Response`) and `Write` |
+| `internal/passgen` | stdlib only (`crypto/rand`) | Core password generation logic — pattern expansion, `Generate`, `GenerateSplit` |
+| `internal/passgencmd` | `internal/passgen`, `internal/scriptfilter` | Query dispatch, argument parsing, overview/help rendering |
+| `cmd/password-generator-alfred` | `internal/passgencmd`, `internal/scriptfilter` | Reads `os.Args[1]`, recovers panics, writes JSON to stdout |
 
-### Application Layer (`src/app/`)
-
-| Module | Imports from | Notes |
-|---|---|---|
-| `core.py` | `alfred.router`, `app.commands.*` | Dependency injection point |
-| `commands/passgen_cmd.py` | `alfred.response`, `alfred.logger`, `app.services.passgen_service` | Default + panc + split handlers |
-| `commands/config_cmd.py` | `alfred.response`, `alfred.config`, `alfred.logger` | Config viewer/reset |
-| `commands/help_cmd.py` | `alfred.response` | Help display |
-| `services/passgen_service.py` | stdlib only | Core password generation logic |
-
-### Tests (`tests/`)
+## Tests
 
 | File | Tests |
 |---|---|
-| `test_alfred.py` | Alfred SDK modules (response, router, cache, config, safe_run) |
-| `test_commands.py` | Command handlers (passgen, config, help) |
-| `test_services.py` | `passgen_service` (generate, generate_split, pattern expansion) |
-| `conftest.py` | pytest fixtures — sets Alfred env vars to tmp dirs |
+| `internal/passgen/passgen_test.go` | `Generate`, `GenerateSplit`, pattern expansion (valid/invalid ranges), class-diversity retry |
+| `internal/passgencmd/passgencmd_test.go` | Command dispatch (passgen, panc, split, pin, code, help), overview mode, error items, `maxAttempts()` env fallback |

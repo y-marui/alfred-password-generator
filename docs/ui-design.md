@@ -36,7 +36,8 @@ Alfred result items are JSON objects with the following fields used in this work
 
 - Empty query → show a placeholder item with `valid: false` to guide the user.
 - No results → show an informative item (e.g., `No results for "foo"`) with `valid: false`.
-- Error → `safe_run` automatically shows an error item; do not hide errors silently.
+- Error → `cmd/password-generator-alfred`'s panic recovery automatically shows an
+  error item; do not hide errors silently.
 
 ## Icon
 
@@ -77,17 +78,6 @@ arg:      <URL>
 uid:      open-<name>
 valid:    true
 autocomplete: open <name>
-```
-
-### `config` items
-
-```
-title:    <key>: <value>      (for existing settings)
-          Reset all settings  (action item)
-subtitle: Current setting     (for existing settings)
-          wf config reset ... (for action item)
-valid:    false (settings display)
-          true  (reset action)
 ```
 
 ### `help` items
