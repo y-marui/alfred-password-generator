@@ -50,12 +50,12 @@ type overviewEntry struct {
 }
 
 var overview = []overviewEntry{
+	{name: "pin", pattern: patternDigits, fixedLength: pinLength},
+	{name: "code", pattern: patternDigits, fixedLength: codeLength},
 	{name: "basic", pattern: patternBasic},
 	{name: "panc", pattern: patternPanc},
 	{name: "split", pattern: patternBasic, split: true},
 	{name: "panc split", pattern: patternPanc, split: true},
-	{name: "pin", pattern: patternDigits, fixedLength: pinLength},
-	{name: "code", pattern: patternDigits, fixedLength: codeLength},
 }
 
 // Dispatch parses the raw Alfred query and routes it to the matching
