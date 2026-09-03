@@ -12,7 +12,7 @@
 |---|---|
 | 開発対象 | Alfred 5 Script Filter ワークフロー |
 | ライセンス | MIT |
-| 動作環境 | Python 3.9+, Alfred 5 |
+| 動作環境 | Go（ビルド時のみ、`go.mod` 参照）, Alfred 5 |
 
 長さと文字セットを自由に指定してパスワードを生成する Alfred ワークフロー。
 
@@ -76,15 +76,12 @@ Alfred の設定（`⌘,`）から以下の項目を設定できます。
 
 | 設定 | デフォルト | 説明 |
 |---|---|---|
-| Use uv | ON | uv がインストールされている場合に `uv run python` で実行 |
 | Clipboard History | OFF | パスワードを Alfred のクリップボード履歴に保存する（セキュリティ上 OFF 推奨） |
-| Log Level | WARNING | ログの詳細度（開発時は DEBUG、本番は WARNING） |
 
 ## Installation
 
 ```bash
-make install    # 開発用依存関係をインストール
-make build      # ワークフローパッケージをビルド
+make build-workflow   # ワークフローパッケージをビルド
 # → dist/*.alfredworkflow
 ```
 
@@ -94,13 +91,13 @@ make build      # ワークフローパッケージをビルド
 
 ```
 alfred-password-generator/
-├── src/
-│   ├── alfred/         # Alfred SDK (response, router, config, logger, safe_run)
-│   └── app/
-│       ├── commands/   # passgen_cmd, config_cmd, help_cmd
-│       └── services/   # passgen_service (コアロジック)
-├── workflow/           # Alfred パッケージ (info.plist, scripts/entry.py)
-└── tests/              # pytest テストスイート
+├── cmd/
+│   └── password-generator-alfred/  # Alfred が起動するバイナリ
+├── internal/
+│   ├── passgen/         # パスワード生成ロジック（コア）
+│   ├── passgencmd/      # コマンドディスパッチ・引数解析・help
+│   └── scriptfilter/    # Alfred Script Filter JSON 型
+└── workflow/            # Alfred パッケージ (info.plist, icon.png)
 ```
 
 ## License

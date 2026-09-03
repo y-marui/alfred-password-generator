@@ -12,7 +12,7 @@
 |---|---|
 | Target | Alfred 5 Script Filter workflow |
 | License | MIT |
-| Runtime | Python 3.9+, Alfred 5 |
+| Runtime | Go (build-time only, see `go.mod`), Alfred 5 |
 
 Generate passwords with customizable length and character set.
 
@@ -74,15 +74,12 @@ Access settings via Alfred Preferences (`⌘,`).
 
 | Setting | Default | Description |
 |---|---|---|
-| Use uv | ON | Run via `uv run python` when uv is installed |
 | Clipboard History | OFF | Save passwords to Alfred's clipboard history (not recommended for security) |
-| Log Level | WARNING | Log verbosity (DEBUG for development, WARNING for production) |
 
 ## Installation
 
 ```bash
-make install    # Install dev dependencies
-make build      # Build workflow package
+make build-workflow   # Build workflow package
 # → dist/*.alfredworkflow
 ```
 
@@ -92,13 +89,13 @@ Double-click `dist/*.alfredworkflow` to install in Alfred.
 
 ```
 alfred-password-generator/
-├── src/
-│   ├── alfred/         # Alfred SDK (response, router, config, logger, safe_run)
-│   └── app/
-│       ├── commands/   # passgen_cmd, config_cmd, help_cmd
-│       └── services/   # passgen_service (core logic)
-├── workflow/           # Alfred package (info.plist, scripts/entry.py)
-└── tests/              # pytest test suite
+├── cmd/
+│   └── password-generator-alfred/  # The binary Alfred invokes
+├── internal/
+│   ├── passgen/         # Password generation logic (core)
+│   ├── passgencmd/      # Command dispatch, argument parsing, help
+│   └── scriptfilter/    # Alfred Script Filter JSON types
+└── workflow/            # Alfred package (info.plist, icon.png)
 ```
 
 ## License
