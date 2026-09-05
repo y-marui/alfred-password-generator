@@ -10,13 +10,12 @@ Alfred result items are JSON objects with the following fields used in this work
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `title` | string | yes | Primary text (large, always visible) |
-| `subtitle` | string | no | Secondary text (small, below title) |
-| `arg` | string | no | Value passed to Alfred's action on Enter |
+| `title` | string | yes | Primary text (large, always visible) — the generated password itself, or a command's usage string in `passgen help` |
+| `subtitle` | string | no | Secondary text (small, below title) — the length/pattern description, or a command's description in `passgen help` |
+| `arg` | string | no | The generated password; copied to the clipboard on Enter |
 | `uid` | string | no | Unique ID for Alfred's learned ordering |
-| `valid` | bool | yes | If false, Enter does not trigger an action |
-| `autocomplete` | string | no | Text inserted into Alfred's input on Tab |
-| `icon` | object | no | Custom icon (`{ "path": "icon.png" }`) |
+| `valid` | bool | yes | If false, Enter does not trigger an action (`passgen help` rows) |
+| `autocomplete` | string | no | Text inserted into Alfred's input on Tab — used by `passgen help` rows |
 
 ## Text Guidelines
 
@@ -27,23 +26,22 @@ Alfred result items are JSON objects with the following fields used in this work
 - **Reason:** Emoji rendering is inconsistent across Alfred versions and macOS
   updates. ASCII symbols are universally stable.
 
-### Capitalization
-
-- `title`: Sentence case for action labels; preserve original casing for data values.
-- `subtitle`: Sentence case. Use short phrases, not full sentences.
-
 ### Empty / Error States
 
-- Empty query → show a placeholder item with `valid: false` to guide the user.
-- No results → show an informative item (e.g., `No results for "foo"`) with `valid: false`.
-- Error → `cmd/password-generator-alfred`'s panic recovery automatically shows an
-  error item; do not hide errors silently.
+- Bare `passgen` (or a length with no pattern) → an overview: one generated
+  password per registered variant (`pin`, `code`, `basic`, `panc`, `split`,
+  `panc split`), each `valid: true`, not a placeholder.
+- No valid pattern for the requested length → a single error item,
+  `title: "Error: No valid patterns for length <n>"`, `valid: false`.
+- Generation failure (e.g. an exhausted pattern) → a single error item,
+  `title: "Error: <message>"`, `subtitle: "Press ⌘C to copy the error"`,
+  `valid: false`.
 
 ## Icon
 
 - Workflow icon: `workflow/icon.png` (PNG, any size — Alfred scales it).
 - Alfred controls light/dark mode; do not ship separate light/dark icons.
-- Per-item icons are optional. If omitted, the workflow icon is used.
+- No per-item icons are used in this workflow.
 
 ## Keyboard Shortcuts
 
@@ -51,40 +49,61 @@ These are standard Alfred behaviors — do not override them in the workflow:
 
 | Key | Action |
 |---|---|
-| ↩ Enter | Run action with `arg` |
-| ⌘↩ | Alfred action picker |
-| ⇥ Tab | Insert `autocomplete` text into Alfred input |
-| ⌘C | Copy `arg` to clipboard |
+| ↩ Enter | Copy the generated password (`arg`) to clipboard |
+| ⇥ Tab | Insert `autocomplete` text into Alfred's input (`passgen help` rows) |
+| ⌘C | Copy `arg` to clipboard (also how to copy an error message) |
 | ⌘L | Show `title` in Large Type |
 
 ## Layout Conventions by Command
 
-### `search` results
+### `passgen` overview (bare keyword, or a length with no pattern)
+
+One item per registered variant:
 
 ```
-title:    <result title>
-subtitle: <result subtitle or URL>
-arg:      <URL or identifier>
-uid:      <unique result ID>
+title:    <generated password>
+subtitle: <variant name> · <length> chars[ in groups of <n>]
+arg:      <generated password>
+uid:      passgen-<index>
 valid:    true
 ```
 
-### `open` shortcut list
+### `passgen [length] [pattern]`, `passgen panc [...]`, `passgen pin [...]`, `passgen code [...]`
+
+One or more suggestions (5 for `panc`/`pin`/`code`, 1 for a fully-specified
+`passgen [length] [pattern]`):
 
 ```
-title:    <shortcut name>
-subtitle: <URL>
-arg:      <URL>
-uid:      open-<name>
+title:    <generated password>
+subtitle: <length> chars, pattern: <pattern>
+arg:      <generated password>
+uid:      passgen-<index>
 valid:    true
-autocomplete: open <name>
 ```
 
-### `help` items
+### `passgen split [...]` / `passgen panc split [...]`
 
 ```
-title:    wf <command> <args>
+title:    <generated password, grouped>
+subtitle: <length> chars in groups of <by>, pattern: <pattern>
+arg:      <generated password>
+uid:      passgen-<index>
+valid:    true
+```
+
+### `passgen help`
+
+```
+title:    passgen <command usage>
 subtitle: <command description>
 valid:    false
 autocomplete: <command trigger string>
+```
+
+### Error rows
+
+```
+title:    "Error: <message>"
+subtitle: "Press ⌘C to copy the error"
+valid:    false
 ```
