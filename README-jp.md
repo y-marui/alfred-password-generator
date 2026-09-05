@@ -18,7 +18,7 @@
 
 ## Usage
 
-Alfred を開いて `passgen` に続けてスペースを入力します。
+`passgen` キーワードでパスワードを生成します。
 
 ### Basic (default)
 
