@@ -26,6 +26,7 @@ that submission is not blocked on our side whenever that step happens.
 | No self-installed external software | ✅ Done | `go.mod` has no third-party dependencies; nothing is fetched at runtime |
 | Icon ≥ 256×256 px | ✅ Done | `workflow/icon.png` is 256×256 |
 | Keyword ≥ 3 characters | ✅ Done | `passgen` (7 characters) |
+| Category set | ✅ Done | `Tools & Utilities` — see [`docs/alfred-workflow-notes/workflow-object-schema.md`](docs/alfred-workflow-notes/workflow-object-schema.md#category) for the valid value list |
 | User Configuration over environment variables | ✅ N/A | Length/pattern/mode are per-invocation query arguments, not persistent settings |
 | English instructions in About/README | ✅ Done | `README.md` is the reference (English) version; `README-jp.md` is canonical |
 | README follows Gallery style guide | ✅ Done | `## Usage` opens with "via the `passgen` keyword" phrasing |

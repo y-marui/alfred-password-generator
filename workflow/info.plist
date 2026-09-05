@@ -4,6 +4,8 @@
 <dict>
 	<key>bundleid</key>
 	<string>com.y-marui.alfred-password-generator</string>
+	<key>category</key>
+	<string>Tools &amp; Utilities</string>
 	<key>connections</key>
 	<dict>
 		<key>0412B2E6-130D-4C14-AE41-FA7CBE0002A6</key>
