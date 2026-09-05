@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>com.github.y-marui.alfred-password-generator</string>
+	<string>com.y-marui.alfred-password-generator</string>
 	<key>connections</key>
 	<dict>
 		<key>0412B2E6-130D-4C14-AE41-FA7CBE0002A6</key>
