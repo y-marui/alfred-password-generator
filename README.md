@@ -18,7 +18,7 @@ Generate passwords with customizable length and character set.
 
 ## Usage
 
-Open Alfred and type `passgen` followed by a space.
+Generate a password via the `passgen` keyword.
 
 ### Basic (default)
 
