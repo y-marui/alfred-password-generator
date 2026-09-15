@@ -20,6 +20,8 @@ Generate passwords with customizable length and character set.
 
 Generate a password via the `passgen` keyword.
 
+![passgen keyword result](images/passgen.png)
+
 ### Basic (default)
 
 ```

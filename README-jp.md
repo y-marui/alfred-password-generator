@@ -20,6 +20,8 @@
 
 `passgen` キーワードでパスワードを生成します。
 
+![passgen キーワードの実行結果](images/passgen.png)
+
 ### Basic (default)
 
 ```

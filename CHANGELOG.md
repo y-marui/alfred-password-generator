@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Gallery-style screenshot of the `passgen` keyword entry point in README/README-jp.
+
+### Added
+
 - `pin` and `code` commands (`passgen pin [length]` / `passgen code [length]`) generating
   numeric-only passwords, 4 and 6 digits by default respectively; also added to the
   bare-length overview alongside basic/panc/split/panc split.

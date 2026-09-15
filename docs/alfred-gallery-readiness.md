@@ -30,7 +30,7 @@ that submission is not blocked on our side whenever that step happens.
 | User Configuration over environment variables | ✅ N/A | Length/pattern/mode are per-invocation query arguments, not persistent settings |
 | English instructions in About/README | ✅ Done | `README.md` is the reference (English) version; `README-jp.md` is canonical |
 | README follows Gallery style guide | ✅ Done | `## Usage` opens with "via the `passgen` keyword" phrasing |
-| Screenshots (full Alfred window, shadow, no background) | ❌ Missing | No `images/` directory exists; needs a real Alfred window capture, which this repository's automation cannot produce. Tracked in [#24](https://github.com/y-marui/alfred-password-generator/issues/24) |
+| Screenshots (full Alfred window, shadow, no background) | ✅ Done | `images/passgen.png`, real window capture (rounded corners + drop shadow, transparent background) |
 
 ## Out of scope here
 
