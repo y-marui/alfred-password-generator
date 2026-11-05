@@ -17,6 +17,15 @@
 
 Generate passwords with customizable length and character set.
 
+## Installation
+
+```bash
+make build-workflow   # Build workflow package
+# → dist/*.alfredworkflow
+```
+
+Double-click `dist/*.alfredworkflow` to install in Alfred.
+
 ## Usage
 
 Generate a password via the `passgen` keyword.
@@ -99,15 +108,6 @@ Access settings via Alfred Preferences (`⌘,`).
 |---|---|---|
 | Clipboard History | OFF | Save passwords to Alfred's clipboard history (not recommended for security) |
 | Max Generation Attempts | 100 | Max retries to get a mix of character classes in the result (see [Pattern syntax](#pattern-syntax)) |
-
-## Installation
-
-```bash
-make build-workflow   # Build workflow package
-# → dist/*.alfredworkflow
-```
-
-Double-click `dist/*.alfredworkflow` to install in Alfred.
 
 ## Project Structure
 
