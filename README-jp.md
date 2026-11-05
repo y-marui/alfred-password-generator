@@ -1,21 +1,21 @@
 # Alfred Password Generator
 
-> **これは日本語版（正本）です。**
+> **このファイルは正本（日本語版）です。**
 > 英語版（参照）は [README.md](README.md) を参照してください。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/y-marui/alfred-password-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/y-marui/alfred-password-generator/actions/workflows/ci.yml)
 [![Charter Check](https://github.com/y-marui/alfred-password-generator/actions/workflows/dev-charter-check.yml/badge.svg)](https://github.com/y-marui/alfred-password-generator/actions/workflows/dev-charter-check.yml)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/y-marui)](https://github.com/sponsors/y-marui)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/y.marui)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/y-marui?style=social)](https://github.com/sponsors/y-marui)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-donate-yellow.svg)](https://www.buymeacoffee.com/y.marui)
+
+長さと文字セットを自由に指定してパスワードを生成する Alfred ワークフロー。
 
 | 項目 | 内容 |
 |---|---|
 | 開発対象 | Alfred 5 Script Filter ワークフロー |
 | ライセンス | MIT |
 | 動作環境 | Go（ビルド時のみ、`go.mod` 参照）, Alfred 5 |
-
-長さと文字セットを自由に指定してパスワードを生成する Alfred ワークフロー。
 
 ## Installation
 
@@ -25,6 +25,28 @@ make build-workflow   # ワークフローパッケージをビルド
 ```
 
 `dist/*.alfredworkflow` をダブルクリックして Alfred にインストールします。
+
+## Configuration
+
+Alfred の設定（`⌘,`）から以下の項目を設定できます。
+
+| 設定 | デフォルト | 説明 |
+|---|---|---|
+| Clipboard History | OFF | パスワードを Alfred のクリップボード履歴に保存する（セキュリティ上 OFF 推奨） |
+| Max Generation Attempts | 100 | 文字クラスの組み合わせを得るための最大リトライ回数（[Pattern syntax](#pattern-syntax) 参照） |
+
+## Project Structure
+
+```
+alfred-password-generator/
+├── cmd/
+│   └── password-generator-alfred/  # Alfred が起動するバイナリ
+├── internal/
+│   ├── passgen/         # パスワード生成ロジック（コア）
+│   ├── passgencmd/      # コマンドディスパッチ・引数解析・help
+│   └── scriptfilter/    # Alfred Script Filter JSON 型
+└── workflow/            # Alfred パッケージ (info.plist, icon.png)
+```
 
 ## Usage
 
@@ -101,32 +123,18 @@ Enter キーで選択したパスワードをクリップボードにコピー�
 | `A-Za-z0-9` | 英数字 |
 | `A-Za-z0-9!-*` | 英数字 + 記号 |
 
-## Configuration
+## Documentation
 
-Alfred の設定（`⌘,`）から以下の項目を設定できます。
-
-| 設定 | デフォルト | 説明 |
-|---|---|---|
-| Clipboard History | OFF | パスワードを Alfred のクリップボード履歴に保存する（セキュリティ上 OFF 推奨） |
-| Max Generation Attempts | 100 | 文字クラスの組み合わせを得るための最大リトライ回数（[Pattern syntax](#pattern-syntax) 参照） |
-
-## Project Structure
-
-```
-alfred-password-generator/
-├── cmd/
-│   └── password-generator-alfred/  # Alfred が起動するバイナリ
-├── internal/
-│   ├── passgen/         # パスワード生成ロジック（コア）
-│   ├── passgencmd/      # コマンドディスパッチ・引数解析・help
-│   └── scriptfilter/    # Alfred Script Filter JSON 型
-└── workflow/            # Alfred パッケージ (info.plist, icon.png)
-```
+| ドキュメント | 内容 |
+|---|---|
+| [docs/specification.md](docs/specification.md) | 機能仕様とデータフロー |
+| [docs/architecture.md](docs/architecture.md) | アーキテクチャとレイヤー設計 |
+| [docs/ui-design.md](docs/ui-design.md) | Alfred 結果アイテムの UI 規約 |
+| [docs/file-map.md](docs/file-map.md) | ファイル単位の依存関係 |
 
 ## License
 
 MIT — [LICENSE](LICENSE) を参照
 
 ---
-
-*この文書には英語版（参照版）[README.md](README.md) があります。編集時は同一コミットで更新してください。*
+*この文書には英語版 [README.md](README.md) があります。編集時は同一コミットで更新してください。*

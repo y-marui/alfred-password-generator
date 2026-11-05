@@ -1,21 +1,21 @@
 # Alfred Password Generator
 
-> **This is the English (reference) version.**
-> For the Japanese canonical version, see [README-jp.md](README-jp.md).
+> **This is the reference (English) version.**
+> The canonical (Japanese) version is [README-jp.md](README-jp.md).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/y-marui/alfred-password-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/y-marui/alfred-password-generator/actions/workflows/ci.yml)
 [![Charter Check](https://github.com/y-marui/alfred-password-generator/actions/workflows/dev-charter-check.yml/badge.svg)](https://github.com/y-marui/alfred-password-generator/actions/workflows/dev-charter-check.yml)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/y-marui)](https://github.com/sponsors/y-marui)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/y.marui)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/y-marui?style=social)](https://github.com/sponsors/y-marui)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-donate-yellow.svg)](https://www.buymeacoffee.com/y.marui)
+
+Generate passwords with customizable length and character set.
 
 | Field | Value |
 |---|---|
 | Target | Alfred 5 Script Filter workflow |
 | License | MIT |
 | Runtime | Go (build-time only, see `go.mod`), Alfred 5 |
-
-Generate passwords with customizable length and character set.
 
 ## Installation
 
@@ -25,6 +25,28 @@ make build-workflow   # Build workflow package
 ```
 
 Double-click `dist/*.alfredworkflow` to install in Alfred.
+
+## Configuration
+
+Access settings via Alfred Preferences (`⌘,`).
+
+| Setting | Default | Description |
+|---|---|---|
+| Clipboard History | OFF | Save passwords to Alfred's clipboard history (not recommended for security) |
+| Max Generation Attempts | 100 | Max retries to get a mix of character classes in the result (see [Pattern syntax](#pattern-syntax)) |
+
+## Project Structure
+
+```
+alfred-password-generator/
+├── cmd/
+│   └── password-generator-alfred/  # The binary Alfred invokes
+├── internal/
+│   ├── passgen/         # Password generation logic (core)
+│   ├── passgencmd/      # Command dispatch, argument parsing, help
+│   └── scriptfilter/    # Alfred Script Filter JSON types
+└── workflow/            # Alfred package (info.plist, icon.png)
+```
 
 ## Usage
 
@@ -100,32 +122,18 @@ Punctuation range: `!-*` expands to `!@#^&*`.
 | `A-Za-z0-9` | Alphanumeric |
 | `A-Za-z0-9!-*` | Alphanumeric + punctuation |
 
-## Configuration
+## Documentation
 
-Access settings via Alfred Preferences (`⌘,`).
-
-| Setting | Default | Description |
-|---|---|---|
-| Clipboard History | OFF | Save passwords to Alfred's clipboard history (not recommended for security) |
-| Max Generation Attempts | 100 | Max retries to get a mix of character classes in the result (see [Pattern syntax](#pattern-syntax)) |
-
-## Project Structure
-
-```
-alfred-password-generator/
-├── cmd/
-│   └── password-generator-alfred/  # The binary Alfred invokes
-├── internal/
-│   ├── passgen/         # Password generation logic (core)
-│   ├── passgencmd/      # Command dispatch, argument parsing, help
-│   └── scriptfilter/    # Alfred Script Filter JSON types
-└── workflow/            # Alfred package (info.plist, icon.png)
-```
+| Document | Description |
+|---|---|
+| [docs/specification.md](docs/specification.md) | Functional specification and data flow |
+| [docs/architecture.md](docs/architecture.md) | Architecture and layer design |
+| [docs/ui-design.md](docs/ui-design.md) | Alfred result item UI conventions |
+| [docs/file-map.md](docs/file-map.md) | File-level dependency map |
 
 ## License
 
 MIT — see [LICENSE](LICENSE)
 
 ---
-
-*This is the reference (English) version. The canonical Japanese version is [README-jp.md](README-jp.md). Update both files in the same commit.*
+*This document has a Japanese canonical version [README-jp.md](README-jp.md). Update both in the same commit when editing.*
