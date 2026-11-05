@@ -17,6 +17,15 @@
 
 長さと文字セットを自由に指定してパスワードを生成する Alfred ワークフロー。
 
+## Installation
+
+```bash
+make build-workflow   # ワークフローパッケージをビルド
+# → dist/*.alfredworkflow
+```
+
+`dist/*.alfredworkflow` をダブルクリックして Alfred にインストールします。
+
 ## Usage
 
 `passgen` キーワードでパスワードを生成します。
@@ -100,15 +109,6 @@ Alfred の設定（`⌘,`）から以下の項目を設定できます。
 |---|---|---|
 | Clipboard History | OFF | パスワードを Alfred のクリップボード履歴に保存する（セキュリティ上 OFF 推奨） |
 | Max Generation Attempts | 100 | 文字クラスの組み合わせを得るための最大リトライ回数（[Pattern syntax](#pattern-syntax) 参照） |
-
-## Installation
-
-```bash
-make build-workflow   # ワークフローパッケージをビルド
-# → dist/*.alfredworkflow
-```
-
-`dist/*.alfredworkflow` をダブルクリックして Alfred にインストールします。
 
 ## Project Structure
 
